@@ -41,27 +41,46 @@ public:
    
    list(const A& a = A())  
    {
-      numElements = 99;
-      pHead = pTail = new list <T, A> ::Node();
+      numElements = 0;
+      pHead = pTail = nullptr;
    }
+   
    list(list <T, A> & rhs, const A& a = A())
    {
-      numElements = 99;
-      pHead = pTail = new list <T, A> ::Node();
+      numElements = 0;
+      pHead = pTail = nullptr;
+      
+      Node* pCurrent = rhs.pHead;
+      
+      while (pCurrent != nullptr)
+      {
+         push_back(pCurrent->data);
+         pCurrent = pCurrent->pNext;
+      }
    }
+   
    list(list <T, A>&& rhs, const A& a = A());
    list(size_t num, const T & t, const A& a = A());
    list(size_t num, const A& a = A());
    list(const std::initializer_list<T>& il, const A& a = A()) 
    {
-      numElements = 99;
-      pHead = pTail = new list <T, A> ::Node();
+      numElements = 0;
+      pHead = pTail = nullptr;
+      
+      for (const auto& item : il)
+         push_back(item);
    }
    template <class Iterator>
    list(Iterator first, Iterator last, const A& a = A())
    {
-      numElements = 99;
-      pHead = pTail = new list <T, A> ::Node();
+      numElements = 0;
+      pHead = pTail = nullptr;
+      
+      while (first != last)
+      {
+         push_back(*first);
+         first++;
+      }
    }
    ~list()
    { 
@@ -116,8 +135,8 @@ public:
    // Status
    //
    
-   bool empty()  const { return true; }
-   size_t size() const { return 98;   }
+   bool empty()  const { return numElements == 0; }
+   size_t size() const { return numElements; }
 
 #ifdef DEBUG // make this visible to the unit tests
 public:
@@ -148,17 +167,17 @@ public:
    //
    // Construct
    //
-   Node()
+   Node() : data()
    {
-      pNext = pPrev = this;
+      pNext = pPrev = nullptr;
    }
-   Node(const T& data)
+   Node(const T& data) : data(data)
    {
-      pNext = pPrev = this;
+      pNext = pPrev = nullptr;
    }
-   Node(T&& data)
+   Node(T&& data) : data(std::move(data))
    {
-      pNext = pPrev = this;
+      pNext = pPrev = nullptr;
    }
 
    //
@@ -251,8 +270,13 @@ private:
 template <typename T, typename A>
 list <T, A> ::list(size_t num, const T & t, const A& a) 
 {
-   numElements = 99;
-   pHead = pTail = new list <T, A> ::Node();
+   numElements = 0;
+   pHead = pTail = nullptr;
+   
+   for (size_t i = 0; i < num; ++i)
+   {
+      push_back(t);
+   }
 }
 
 /*****************************************
@@ -262,9 +286,25 @@ list <T, A> ::list(size_t num, const T & t, const A& a)
 template <typename T, typename A>
 list <T, A> ::list(size_t num, const A& a) 
 {
-   numElements = 99;
-   pHead = pTail = new list <T, A> ::Node();
-
+   numElements = 0;
+   pHead = pTail = nullptr;
+   
+   for (size_t i = 0; i < num; ++i)
+   {
+      Node* pNew = new Node();
+      
+      if (pHead == nullptr)
+      {
+         pHead = pTail = pNew;
+      }
+      else
+      {
+         pTail->pNext = pNew;
+         pNew->pPrev = pTail;
+         pTail = pNew;
+      }
+      numElements++;
+   }
 }
 
 /*****************************************
@@ -341,13 +381,39 @@ void list <T, A> :: clear()
 template <typename T, typename A>
 void list <T, A> :: push_back(const T & data)
 {
-
+   Node* pNew = new Node(data);
+   
+   if (pHead == nullptr)
+   {
+      pHead = pTail = pNew;
+   }
+   else
+   {
+      pTail->pNext = pNew;
+      pNew->pPrev = pTail;
+      pTail = pNew;
+   }
+   
+   numElements++;
 }
 
 template <typename T, typename A>
 void list <T, A> ::push_back(T && data)
 {
-
+   Node* pNew = new Node(std::move(data));
+   
+   if (pHead == nullptr)
+   {
+      pHead = pTail = pNew;
+   }
+   else
+   {
+      pTail->pNext = pNew;
+      pNew->pPrev = pTail;
+      pTail = pNew;
+   }
+   
+   numElements++;
 }
 
 /*********************************************
