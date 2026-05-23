@@ -427,13 +427,39 @@ void list <T, A> ::push_back(T && data)
 template <typename T, typename A>
 void list <T, A> :: push_front(const T & data)
 {
-
+    Node* pNew = new Node(data);                // new node from given data
+    
+    if (pHead == nullptr)                       // if it's empty
+    {
+       pHead = pTail = pNew;
+    }
+    else                                        // if it's not...
+    {
+       pHead->pPrev = pNew;                     // add new node before current head
+       pNew->pNext = pHead;                     // adjust other nodes accordingly
+       pHead = pNew;
+    }
+    
+    numElements++;
 }
 
 template <typename T, typename A>
 void list <T, A> ::push_front(T && data)
 {
-
+    Node* pNew = new Node(std::move(data));     // same as previous except using move
+    
+    if (pHead == nullptr)
+    {
+       pHead = pTail = pNew;
+    }
+    else
+    {
+       pHead->pPrev = pNew;
+       pNew->pNext = pHead;
+       pHead = pNew;
+    }
+    
+    numElements++;
 }
 
 
@@ -473,7 +499,9 @@ void list <T, A> ::pop_front()
 template <typename T, typename A>
 T & list <T, A> :: front()
 {
-   return *(new T);
+    if (empty())
+        throw "ERROR: unable to access data from an empty list";
+   return pHead->data;
 }
 
 /*********************************************
@@ -486,7 +514,9 @@ T & list <T, A> :: front()
 template <typename T, typename A>
 T & list <T, A> :: back()
 {
-   return *(new T);
+    if (empty())
+        throw "ERROR: unable to access data from an empty list";
+   return pTail->data;
 }
 
 

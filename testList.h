@@ -64,22 +64,22 @@ public:
       //test_iterator_dereference_update();
       
       // Access
-      //test_front_empty();
-      //test_front_standardRead();
-      //test_front_standardWrite();
-      //test_back_empty();
-      //test_back_standardRead();
-      //test_back_standardWrite();
+      test_front_empty();
+      test_front_standardRead();
+      test_front_standardWrite();
+      test_back_empty();
+      test_back_standardRead();
+      test_back_standardWrite();
       
       // Insert
       test_pushback_empty();
       //test_pushback_standard(); // NYI
       test_pushback_moveEmpty();
       test_pushback_moveStandard();
-      //test_pushfront_empty();
-      //test_pushfront_standard();
-      //test_pushfront_moveEmpty();
-      //test_pushfront_moveStandard();
+      test_pushfront_empty();
+      test_pushfront_standard();
+      test_pushfront_moveEmpty();
+      test_pushfront_moveStandard();
       //test_insert_empty();
       //test_insert_standardFront();
       //test_insert_standardMiddle();
@@ -1473,19 +1473,35 @@ public:
    // write the element to the back of the standard list
    void test_back_standardWrite()
    {  // setup
-      //        pHead             pTail
-      //       +----+   +----+   +----+
-      //       | 11 | - | 26 | - | 31 |
-      //       +----+   +----+   +----+
-      // exercise
-      // verify
-      // assign 99 to [31]
-      assertUnit(NOT_YET_IMPLEMENTED);
-      // l      pHead             pTail
-      //       +----+   +----+   +----+
-      //       | 11 | - | 26 | - | 99 |
-      //       +----+   +----+   +----+
-      // teardown
+       //        pHead             pTail
+       //       +----+   +----+   +----+
+       //       | 11 | - | 26 | - | 31 |
+       //       +----+   +----+   +----+
+       custom::list<Spy> l;
+       setupStandardFixture(l);
+       Spy s(99);
+       Spy::reset();
+       // exercise
+       l.back() = s;
+       // verify
+       assertUnit(Spy::numAssign() == 1);      // assign 99 to [11]
+       assertUnit(Spy::numDestructor() == 0);
+       assertUnit(Spy::numDelete() == 0);
+       assertUnit(Spy::numAlloc() == 0);
+       assertUnit(Spy::numDefault() == 0);
+       assertUnit(Spy::numNondefault() == 0);
+       assertUnit(Spy::numCopy() == 0);
+       assertUnit(Spy::numCopyMove() == 0);
+       assertUnit(Spy::numAssignMove() == 0);
+       // l      pHead             pTail
+       //       +----+   +----+   +----+
+       //       | 11 | - | 26 | - | 99 |
+       //       +----+   +----+   +----+
+       assertUnit(l.pTail->data == Spy(99));
+       l.pTail->data = Spy(31);
+       assertStandardFixture(l);
+       // teardown
+       teardownStandardFixture(l);
    }
 
     /***************************************
