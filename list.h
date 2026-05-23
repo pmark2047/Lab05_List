@@ -198,56 +198,57 @@ class list <T, A> :: iterator
 {
 public:
    // constructors, destructors, and assignment operator
-   iterator()  
-   {
-      p = new list <T, A> ::Node;
-   }
-   iterator(Node * pRHS)
-   {
-      p = new list <T, A> ::Node;
-   }
-   iterator(const iterator  & rhs) 
-   {
-      p = new list <T, A> ::Node;
-   }
-   iterator & operator = (const iterator & rhs)
-   {
-      return *this;
-   }
+    iterator() : p(nullptr) {}
+   
+    iterator(Node * pRHS) : p(pRHS) {}
+        
+    iterator(const iterator  & rhs) : p(rhs.p) {}
+   
+    iterator & operator = (const iterator & rhs)
+    {
+        p = rhs.p;
+        return *this;
+    }
    
    // equals, not equals operator
-   bool operator == (const iterator & rhs) const { return true; }
-   bool operator != (const iterator & rhs) const { return true; }
+   bool operator == (const iterator & rhs) const { return p == rhs.p; }
+   bool operator != (const iterator & rhs) const { return p != rhs.p; }
 
    // dereference operator, fetch a node
    T & operator * ()
    {
-      return *(new T);
+      return p->data;                // return what is inside the node
    }
 
    // postfix increment
    iterator operator ++ (int postfix)
    {
-      return *this;
+       iterator pReturn = *this;
+       p = p->pNext;                 // increment to next node
+       return pReturn;               // return unincremented iterator
    }
 
    // prefix increment
    iterator & operator ++ ()
    {
-      return *this;
+       p = p->pNext;                 // increment to next node
+       return *this;                 // return incremented iterator
    }
    
    // postfix decrement
    iterator operator -- (int postfix)
    {
-      return *this;
+       iterator pReturn = *this;
+       p = p->pPrev;                  // increment to previous node
+       return pReturn;                // return unchanged iterator
    }
 
    // prefix decrement
    iterator & operator -- ()
    {
-      return *this;
-   } 
+       p = p->pPrev;                  // increment to previous node
+       return *this;                  // return updated iterator
+   }
 
    // two friends who need to access p directly
    friend iterator list <T, A> :: insert(iterator it, const T &  data);
