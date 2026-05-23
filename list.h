@@ -499,9 +499,9 @@ void list <T, A> ::pop_front()
 template <typename T, typename A>
 T & list <T, A> :: front()
 {
-    if (empty())
+    if (empty())                    // throw an error if empty
         throw "ERROR: unable to access data from an empty list";
-   return pHead->data;
+   return pHead->data;              // otherwise, return the data from front node
 }
 
 /*********************************************
@@ -514,9 +514,9 @@ T & list <T, A> :: front()
 template <typename T, typename A>
 T & list <T, A> :: back()
 {
-    if (empty())
+    if (empty())                    // throw error if empty
         throw "ERROR: unable to access data from an empty list";
-   return pTail->data;
+   return pTail->data;              // return data from back node
 }
 
 
@@ -530,7 +530,31 @@ T & list <T, A> :: back()
 template <typename T, typename A>
 typename list <T, A> :: iterator  list <T, A> :: erase(const list <T, A> :: iterator & it)
 {
-   return end();
+    iterator itNext = end();
+   
+    if (!it.p)
+        return end();
+    if (it.p->pNext)
+    {
+        it.p->pNext->pPrev = it.p->pPrev;
+        itNext = it.p->pNext;
+    }
+    else
+    {
+        pTail = pTail->pPrev;
+    }
+    if (it.p->pPrev)
+    {
+        it.p->pPrev->pNext = it.p->pNext;
+    }
+    else
+    {
+        pHead = pHead->pNext;
+    }
+    
+    delete it.p;
+    numElements--;
+    return itNext;
 }
 
 /******************************************

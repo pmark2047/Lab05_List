@@ -95,10 +95,10 @@ public:
       //test_popback_standard();
       //test_popfront_empty();
       //test_popfront_standard();
-      //test_erase_empty();
-      //test_erase_standardFront();
-      //test_erase_standardMiddle();
-      //test_erase_standardEnd();
+      test_erase_empty();
+      test_erase_standardFront();
+      test_erase_standardMiddle();
+      test_erase_standardEnd();
 
       // Status
       test_size_empty();
