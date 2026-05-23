@@ -45,11 +45,11 @@ public:
       //test_destructor_standard();
 
       // Assign
-      //test_assign_emptyToEmpty();
-      //test_assign_standardToEmpty();
-      //test_assign_emptyToStandard();
-      //test_assign_smallToBig();
-      //test_assign_bigToSmall();
+      test_assign_emptyToEmpty();
+      test_assign_standardToEmpty();
+      test_assign_emptyToStandard();
+      test_assign_smallToBig();
+      test_assign_bigToSmall();
       //test_assignInit_empty();
       //test_assignInit_sameSize();
       //test_assignInit_rightBigger();
@@ -89,8 +89,8 @@ public:
       test_insertMove_standardMiddle();
 
       // Remove
-      //test_clear_empty();
-      //test_clear_standard();
+      test_clear_empty();
+      test_clear_standard();
       //test_popback_empty();
       //test_popback_standard();
       //test_popfront_empty();
@@ -900,15 +900,28 @@ public:
 
    void test_clear_standard()
    {  // setup
+      custom::list<Spy> l;
+      setupStandardFixture(l);
+      Spy::reset();
       //        pHead             pTail
       //       +----+   +----+   +----+
       //       | 11 | - | 26 | - | 31 |
       //       +----+   +----+   +----+
       // exercise
+      l.clear();
       // verify
+      assertUnit(Spy::numAssign() == 0);
+      assertUnit(Spy::numAlloc() == 0);
+      assertUnit(Spy::numDelete() == 3);
+      assertUnit(Spy::numDefault() == 0);
+      assertUnit(Spy::numNondefault() == 0);
+      assertUnit(Spy::numCopy() == 0);
+      assertUnit(Spy::numCopyMove() == 0);
+      assertUnit(Spy::numAssignMove() == 0);
+      assertUnit(Spy::numDestructor() == 3);
+      assertEmptyFixture(l);
       // destroy [11][26][31]
       // delete [11][26][31]
-      assertUnit(NOT_YET_IMPLEMENTED);
    }  // teardown
 
 
