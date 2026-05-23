@@ -532,24 +532,25 @@ typename list <T, A> :: iterator  list <T, A> :: erase(const list <T, A> :: iter
 {
     iterator itNext = end();
    
-    if (!it.p)
+    if (!it.p)                                   // check if p is empty
         return end();
-    if (it.p->pNext)
+    
+    if (it.p->pNext)                            // it's not at the end
     {
-        it.p->pNext->pPrev = it.p->pPrev;
+        it.p->pNext->pPrev = it.p->pPrev;       // link the remaining nodes togeter
         itNext = it.p->pNext;
     }
     else
     {
-        pTail = pTail->pPrev;
+        pTail = pTail->pPrev;                   // it is at the end, set tail to node before
     }
-    if (it.p->pPrev)
+    if (it.p->pPrev)                            // it's not at the beginning
     {
-        it.p->pPrev->pNext = it.p->pNext;
+        it.p->pPrev->pNext = it.p->pNext;       // link the remaining nodes togeter
     }
     else
     {
-        pHead = pHead->pNext;
+        pHead = pHead->pNext;                   // it's at the beginning, set head to next node
     }
     
     delete it.p;
