@@ -569,7 +569,32 @@ template <typename T, typename A>
 typename list <T, A> :: iterator list <T, A> :: insert(list <T, A> :: iterator it,
                                                  const T & data) 
 {
-   return end();
+   Node* pNew = new Node(data);
+   if(pHead == nullptr)
+      pHead = pTail = pNew;
+   
+   else if(it.p == nullptr)
+   {
+      pNew->pPrev = pTail;
+      pTail->pNext = pNew;
+      pTail = pNew;
+   }
+   else if(it.p == pHead)
+   {
+      pNew->pNext = pHead;
+      pHead->pPrev = pNew;
+      pHead = pNew;
+   }
+   else
+   {
+      pNew->pNext = it.p;
+      pNew->pPrev = it.p->pPrev;
+      it.p->pPrev->pNext = pNew;
+      it.p->pPrev = pNew;
+   }
+   
+   numElements++;
+   return iterator(pNew);
 }
 
 
@@ -585,7 +610,32 @@ template <typename T, typename A>
 typename list <T, A> ::iterator list <T, A> ::insert(list <T, A> ::iterator it,
    T && data)
 {
-   return end();
+   Node* pNew = new Node(std::move(data));
+   if(pHead == nullptr)
+      pHead = pTail = pNew;
+   
+   else if(it.p == nullptr)
+   {
+      pNew->pPrev = pTail;
+      pTail->pNext = pNew;
+      pTail = pNew;
+   }
+   else if(it.p == pHead)
+   {
+      pNew->pNext = pHead;
+      pHead->pPrev = pNew;
+      pHead = pNew;
+   }
+   else
+   {
+      pNew->pNext = it.p;
+      pNew->pPrev = it.p->pPrev;
+      it.p->pPrev->pNext = pNew;
+      it.p->pPrev = pNew;
+   }
+   
+   numElements++;
+   return iterator(pNew);
 }
 
 /**********************************************
