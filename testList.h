@@ -45,11 +45,11 @@ public:
       //test_destructor_standard();
 
       // Assign
-      //test_assign_emptyToEmpty();
-      //test_assign_standardToEmpty();
-      //test_assign_emptyToStandard();
-      //test_assign_smallToBig();
-      //test_assign_bigToSmall();
+      test_assign_emptyToEmpty();
+      test_assign_standardToEmpty();
+      test_assign_emptyToStandard();
+      test_assign_smallToBig();
+      test_assign_bigToSmall();
       //test_assignInit_empty();
       //test_assignInit_sameSize();
       //test_assignInit_rightBigger();
@@ -73,24 +73,24 @@ public:
       
       // Insert
       test_pushback_empty();
-      //test_pushback_standard(); // NYI
+      test_pushback_standard();
       test_pushback_moveEmpty();
       test_pushback_moveStandard();
       test_pushfront_empty();
       test_pushfront_standard();
       test_pushfront_moveEmpty();
       test_pushfront_moveStandard();
-      //test_insert_empty();
-      //test_insert_standardFront();
-      //test_insert_standardMiddle();
-      //test_insert_standardEnd();
-      //test_insertMove_empty();
-      //test_insertMove_standardFront();
-      //test_insertMove_standardMiddle();
+      test_insert_empty();
+      test_insert_standardFront();
+      test_insert_standardMiddle();
+      test_insert_standardEnd();
+      test_insertMove_empty();
+      test_insertMove_standardFront();
+      test_insertMove_standardMiddle();
 
       // Remove
-      //test_clear_empty();
-      //test_clear_standard();
+      test_clear_empty();
+      test_clear_standard();
       //test_popback_empty();
       //test_popback_standard();
       //test_popfront_empty();
@@ -102,7 +102,7 @@ public:
 
       // Status
       test_size_empty();
-      //test_size_three(); // NYI
+      test_size_three();
       //test_empty_empty();
       //test_empty_three();
 
@@ -489,13 +489,27 @@ public:
    // size of graph with four nodes
    void test_size_three()
    {  // setup
+      custom::list<Spy> l;
+      setupStandardFixture(l);
+      size_t size = 99;
+      Spy::reset();
       //    +----+   +----+   +----+
       //    | 11 | - | 26 | - | 31 |
       //    +----+   +----+   +----+      
       // exercise
+      size = l.size();
       // verify
-      assertUnit(NOT_YET_IMPLEMENTED);
+      assertUnit(3 == size);
+      assertUnit(Spy::numDefault() == 0);
+      assertUnit(Spy::numAlloc() == 0);
+      assertUnit(Spy::numDelete() == 0);
+      assertUnit(Spy::numNondefault() == 0);
+      assertUnit(Spy::numCopy() == 0);
+      assertUnit(Spy::numCopyMove() == 0);
+      assertUnit(Spy::numDestructor() == 0);
+      assertStandardFixture(l);
       // teardown
+      teardownStandardFixture(l);
    }
 
    // graph with one node
@@ -886,15 +900,28 @@ public:
 
    void test_clear_standard()
    {  // setup
+      custom::list<Spy> l;
+      setupStandardFixture(l);
+      Spy::reset();
       //        pHead             pTail
       //       +----+   +----+   +----+
       //       | 11 | - | 26 | - | 31 |
       //       +----+   +----+   +----+
       // exercise
+      l.clear();
       // verify
+      assertUnit(Spy::numAssign() == 0);
+      assertUnit(Spy::numAlloc() == 0);
+      assertUnit(Spy::numDelete() == 3);
+      assertUnit(Spy::numDefault() == 0);
+      assertUnit(Spy::numNondefault() == 0);
+      assertUnit(Spy::numCopy() == 0);
+      assertUnit(Spy::numCopyMove() == 0);
+      assertUnit(Spy::numAssignMove() == 0);
+      assertUnit(Spy::numDestructor() == 3);
+      assertEmptyFixture(l);
       // destroy [11][26][31]
       // delete [11][26][31]
-      assertUnit(NOT_YET_IMPLEMENTED);
    }  // teardown
 
 
@@ -941,21 +968,47 @@ public:
    // push an element onto the back of the standard fixture
    void test_pushback_standard()
    {  // setup
+      custom::list<Spy> l;
+      setupStandardFixture(l);
+      Spy s(99);
+      Spy::reset();
       //        pHead             pTail
       //       +----+   +----+   +----+
       //       | 11 | - | 26 | - | 31 |
       //       +----+   +----+   +----+
       // exercise
+      l.push_back(s);
       // verify
-      // copy [99]
-      // allocate [99]
-      assertUnit(NOT_YET_IMPLEMENTED);
+      assertUnit(Spy::numCopy() == 1);       // copy [99]
+      assertUnit(Spy::numAlloc() == 1);      // allocate [99]
+      assertUnit(Spy::numDestructor() == 0);
+      assertUnit(Spy::numDelete() == 0);
+      assertUnit(Spy::numAssign() == 0);
+      assertUnit(Spy::numDefault() == 0);
+      assertUnit(Spy::numNondefault() == 0);
+      assertUnit(Spy::numCopyMove() == 0);
+      assertUnit(Spy::numAssignMove() == 0);
       //        pHead                      pTail
       //       +----+   +----+   +----+   +----+
       //       | 11 | - | 26 | - | 31 | - | 99 |
       //       +----+   +----+   +----+   +----+
+      assertUnit(l.pHead != nullptr);
+      assertUnit(l.pTail != nullptr);
+      assertUnit(l.numElements == 4);
+      if (l.pTail)
+      {
+         assertUnit(l.pTail->data == Spy(99));
+         assertUnit(l.pTail->pNext == nullptr);
+         assertUnit(l.pTail->pPrev != nullptr);
+         if (l.pTail->pPrev)
+         {
+            assertUnit(l.pTail->pPrev->pNext == l.pTail);
+         }
+      }
       // teardown
-   }   
+      assertUnit(s == Spy(99));
+      teardownStandardFixture(l);
+   }
 
    // push back to an empty list
    void test_pushback_moveEmpty()
@@ -1627,20 +1680,71 @@ public:
    // insert an element onto the middle of the standard list
    void test_insert_standardMiddle()
    {  // setup
+      custom::list<Spy>::iterator it;
+      custom::list<Spy>::iterator itReturn;
       //       +----+   +----+   +----+
       //       | 11 | - | 26 | - | 31 |
       //       +----+   +----+   +----+
       //                  it
+      custom::list<Spy> l;
+      setupStandardFixture(l);
+      it.p = l.pHead->pNext;
+      Spy s(99);
+      Spy::reset();
       // exercise
+      itReturn = l.insert(it, s);
       // verify
-      // copy [99]
-      // allocate [99]
+      assertUnit(Spy::numCopy() == 1);          // copy [99]
+      assertUnit(Spy::numAlloc() == 1);         // allocate [99]
+      assertUnit(Spy::numEquals() == 0);
+      assertUnit(Spy::numLessthan() == 0);
+      assertUnit(Spy::numAssign() == 0);
+      assertUnit(Spy::numDestructor() == 0);
+      assertUnit(Spy::numDelete() == 0);
+      assertUnit(Spy::numDefault() == 0);
+      assertUnit(Spy::numNondefault() == 0);
+      assertUnit(Spy::numCopyMove() == 0);
+      assertUnit(Spy::numAssignMove() == 0);
       //       +----+   +----+   +----+   +----+
       //       | 11 | - | 99 | - | 26 | - | 31 |
       //       +----+   +----+   +----+   +----+
       //               itReturn    it
-      assertUnit(NOT_YET_IMPLEMENTED);
+      assertUnit(it.p != nullptr);
+      if (it.p)
+         assertUnit(it.p->data == Spy(26));
+      assertUnit(itReturn.p != nullptr);
+      if (itReturn.p)
+         assertUnit(itReturn.p->data == Spy(99));
+      assertUnit(l.numElements == 4);
+      assertUnit(l.pHead != nullptr);
+      assertUnit(l.pTail != nullptr);
+      if (l.pHead)
+      {
+         assertUnit(l.pHead->data == Spy(11));
+         assertUnit(l.pHead->pNext != nullptr);
+         assertUnit(l.pHead->pPrev == nullptr);
+         if (l.pHead->pNext)
+         {
+            assertUnit(l.pHead->pNext->data == Spy(99));
+            assertUnit(l.pHead->pNext->pNext != nullptr);
+            assertUnit(l.pHead->pNext->pPrev == l.pHead);
+            if (l.pHead->pNext->pNext)
+            {
+               assertUnit(l.pHead->pNext->pNext->data == Spy(26));
+               assertUnit(l.pHead->pNext->pNext->pNext != nullptr);
+               assertUnit(l.pHead->pNext->pNext->pPrev == l.pHead->pNext);
+               assertUnit(l.pHead->pNext->pNext->pNext == l.pTail);
+               if (l.pHead->pNext->pNext->pNext)
+               {
+                  assertUnit(l.pHead->pNext->pNext->pNext->data == Spy(31));
+                  assertUnit(l.pHead->pNext->pNext->pNext->pNext == nullptr);
+                  assertUnit(l.pHead->pNext->pNext->pNext->pPrev == l.pHead->pNext->pNext);
+               }
+            }
+         }
+      }
       // teardown
+      teardownStandardFixture(l);
    }
 
    // insert an element onto the end of the standard list
